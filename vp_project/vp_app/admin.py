@@ -10,7 +10,8 @@ class AnswerInLine(admin.StackedInline):
 class QuestionAdmin(admin.ModelAdmin):
     fields = [
         'content',
-        'date_published'
+        'date_published',
+        'date_concluded'
     ]
     inlines = [AnswerInLine]
 
