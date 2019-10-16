@@ -46,5 +46,16 @@ $ cd vp_project
 $ python manage.py runserver
 ```
 
-If you go to http://localhost:8000/, you should be able to see the site up and running!
-* This project is still in very early development, and the default Django DEBUG page is displayed at the site index. However, if you created a superuser, you can log into http://localhost:8000/admin/ to access the admin site.
+The site up and running! Navigate to any of the URLs below to find out.
+* If you created a superuser, you can log into http://localhost:8000/admin/ to access the admin site.
+
+URLs to try out:
+* http://localhost:8000/user/
+* http://localhost:8000/questions/
+* http://localhost:8000/api-token-auth/
+    * `api-token-auth/` accepts POST requests to log in users.
+    * Use an HTTP tool like [Postman](https://www.getpostman.com/) to get a user token by sending a valid username and password in the body of your POST request.
+
+### The Code
+
+See the [README for 'vp_app'](https://github.com/davidhammaker/Vote_Predict_Backend/tree/master/vp_project/vp_app) for a brief explanation of the code so far.
