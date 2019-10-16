@@ -22,6 +22,12 @@ _Vote-Predict App_
     * There is currently only one view configured: **QuestionList**.
         * This view represents the full list of _Question_ model instances, which are serialized via the _QuestionSerializer_.
         * The view inherits from the [ListCreateAPIView](https://www.django-rest-framework.org/api-guide/generic-views/#listcreateapiview), and therefore supports listing and creating _Question_ model instances.
+        * Note that _QuestionList_ has one listed permission class: "_IsStaffOrReadOnly_". If you access this view (see [`urls.py`](https://github.com/davidhammaker/Vote_Predict_Backend/tree/master/vp_project/vp_app#urlspy) below), the API will display a form field if you are logged in as a staff user, such as a superuser.
+
+#### `permissions.py`
+* Defines all custom permissions used in this app.
+    * There is currently only one custom permission class: **IsStaffOrReadOnly**.
+        * Staff users (including superusers) will have full rights to any views with this permission class. Other users will only be able to use "Safe" HTTP requests like GET and OPTIONS. For example, this class is used in the _QuestionsList_ view so that only site staff will be able to create new questions.
 
 #### `urls.py`
 * Configure URLs for the app.
