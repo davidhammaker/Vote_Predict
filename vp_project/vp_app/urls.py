@@ -27,4 +27,9 @@ urlpatterns = [
         vp_app_views.AnswerDetail.as_view(),
         name='answer-detail'
     ),
+    path(
+        'responses/',
+        vp_app_views.ResponseList.as_view(),
+        name='response-list'
+    ),
 ]
