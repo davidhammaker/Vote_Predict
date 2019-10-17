@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, authentication
 from .models import Question, Answer
 from .serializers import QuestionSerializer, AnswerSerializer
 from .permissions import IsStaffOrReadOnly
@@ -6,6 +6,10 @@ from .permissions import IsStaffOrReadOnly
 
 class QuestionList(generics.ListCreateAPIView):
     permission_classes = [IsStaffOrReadOnly, ]
+    authentication_classes = [
+        authentication.TokenAuthentication,
+        authentication.SessionAuthentication,
+    ]
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
 
@@ -31,6 +35,10 @@ class QuestionAnswers(generics.ListAPIView):
 
 class AnswerList(generics.ListCreateAPIView):
     permission_classes = [IsStaffOrReadOnly, ]
+    authentication_classes = [
+        authentication.TokenAuthentication,
+        authentication.SessionAuthentication,
+    ]
     serializer_class = AnswerSerializer
     queryset = Answer.objects.all()
 
