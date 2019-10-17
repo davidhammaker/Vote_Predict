@@ -4,7 +4,7 @@ from .models import Question, Answer
 
 class AnswerInLine(admin.StackedInline):
     model = Answer
-    extra = 1
+    extra = 2
 
 
 class QuestionAdmin(admin.ModelAdmin):
