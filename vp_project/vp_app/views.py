@@ -5,7 +5,7 @@ from .serializers import (
     AnswerSerializer,
     ResponseSerializer,
 )
-from .permissions import IsStaffOrReadOnly
+from .permissions import IsStaffOrReadOnly, IsOwnerOrReadOnly
 
 
 class QuestionList(generics.ListCreateAPIView):
@@ -81,3 +81,13 @@ class QuestionResponses(generics.ListCreateAPIView):
             user=self.request.user,
             question=Question.objects.get(id=self.kwargs['question_id'])
         )
+
+
+class ResponseDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsOwnerOrReadOnly, ]
+    authentication_classes = [
+        authentication.TokenAuthentication,
+        authentication.SessionAuthentication,
+    ]
+    serializer_class = ResponseSerializer
+    queryset = Response.objects.all()

@@ -37,4 +37,9 @@ urlpatterns = [
         vp_app_views.QuestionResponses.as_view(),
         name='question-responses'
     ),
+    path(
+        'responses/<int:pk>/',
+        vp_app_views.ResponseDetail.as_view(),
+        name='response-detail'
+    ),
 ]
