@@ -32,4 +32,9 @@ urlpatterns = [
         vp_app_views.ResponseList.as_view(),
         name='response-list'
     ),
+    path(
+        'questions/<int:question_id>/responses/',
+        vp_app_views.QuestionResponses.as_view(),
+        name='question-responses'
+    ),
 ]

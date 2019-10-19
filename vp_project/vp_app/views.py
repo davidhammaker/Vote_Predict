@@ -67,3 +67,28 @@ class ResponseList(generics.ListCreateAPIView):
         Relate users to responses.
         """
         serializer.save(user=self.request.user)
+
+
+class QuestionResponses(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+    authentication_classes = [
+        authentication.TokenAuthentication,
+        authentication.SessionAuthentication,
+    ]
+    serializer_class = ResponseSerializer
+
+    def get_queryset(self):
+        """
+        Display all responses to a question with id 'question_id'.
+        """
+        question_id = self.kwargs['question_id']
+        return Response.objects.filter(question=question_id)
+
+    def perform_create(self, serializer):
+        """
+        Relate Users and Questions to Responses.
+        """
+        serializer.save(
+            user=self.request.user,
+            question=Question.objects.get(id=self.kwargs['question_id'])
+        )
