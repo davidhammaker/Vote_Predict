@@ -53,20 +53,9 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Answer.objects.all()
 
 
-class ResponseList(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
-    authentication_classes = [
-        authentication.TokenAuthentication,
-        authentication.SessionAuthentication,
-    ]
+class ResponseList(generics.ListAPIView):
     serializer_class = ResponseSerializer
     queryset = Response.objects.all()
-
-    def perform_create(self, serializer):
-        """
-        Relate users to responses.
-        """
-        serializer.save(user=self.request.user)
 
 
 class QuestionResponses(generics.ListCreateAPIView):
