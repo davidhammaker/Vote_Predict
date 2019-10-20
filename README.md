@@ -1,6 +1,6 @@
 # Vote Predict
 
-[![Build Status](https://travis-ci.org/davidhammaker/Vote_Predict_Backend.svg?branch=master)](https://travis-ci.org/davidhammaker/Vote_Predict_Backend)
+[![Build Status](https://travis-ci.org/davidhammaker/Vote_Predict_Backend.svg?branch=master)](https://travis-ci.org/davidhammaker/Vote_Predict_Backend) [![codecov](https://codecov.io/gh/davidhammaker/Vote_Predict_Backend/branch/master/graph/badge.svg)](https://codecov.io/gh/davidhammaker/Vote_Predict_Backend)
 
 A web-app in which you pick one of two answers to the given question, then try to guess what other users have picked.
 

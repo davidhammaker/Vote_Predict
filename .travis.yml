@@ -5,4 +5,7 @@ python:
 install:
     - pip install -r requirements.txt
 
-script: python vp_project/manage.py test
+script: pytest vp_project/
+
+after_success:
+    - codecov
