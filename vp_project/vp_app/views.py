@@ -24,8 +24,12 @@ class QuestionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Question.objects.all()
 
 
-class QuestionAnswers(generics.ListAPIView):
+class QuestionAnswers(generics.ListCreateAPIView):
     permission_classes = [IsStaffOrReadOnly, ]
+    authentication_classes = [
+        authentication.TokenAuthentication,
+        authentication.SessionAuthentication
+    ]
     serializer_class = AnswerSerializer
 
     def get_queryset(self):
@@ -37,12 +41,7 @@ class QuestionAnswers(generics.ListAPIView):
         return Answer.objects.filter(question=question_id)
 
 
-class AnswerList(generics.ListCreateAPIView):
-    permission_classes = [IsStaffOrReadOnly, ]
-    authentication_classes = [
-        authentication.TokenAuthentication,
-        authentication.SessionAuthentication,
-    ]
+class AnswerList(generics.ListAPIView):
     serializer_class = AnswerSerializer
     queryset = Answer.objects.all()
 
