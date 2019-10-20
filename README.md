@@ -58,6 +58,13 @@ URLs to try out:
     * `api-token-auth/` accepts POST requests to log in users.
     * Use an HTTP tool like [Postman](https://www.getpostman.com/) to get a user token by sending a valid username and password in the body of your POST request.
 
+### Testing
+
+Please note that **tests are still in the works**. However, several tests have already been written. Ultimately, tests should cover as much of the code as possible.
+
+To test the application, navigate to the `vp_project` directory (containing `manage.py` and `pytest.ini`). From here, you can run `pytest` to test the code.
+* Alternatively, you can run `python manage.py test` in traditional Django fashion. But as testing for the app grows, there may come a point where this is no longer possible.
+
 ### The Code
 
 See the [README for 'vp_app'](https://github.com/davidhammaker/Vote_Predict_Backend/tree/master/vp_project/vp_app) for a brief explanation of the code so far.
