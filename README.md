@@ -1,5 +1,7 @@
 # Vote Predict
 
+[![Build Status](https://travis-ci.org/davidhammaker/Vote_Predict_Backend.svg?branch=master)](https://travis-ci.org/davidhammaker/Vote_Predict_Backend)
+
 A web-app in which you pick one of two answers to the given question, then try to guess what other users have picked.
 
 ## Getting Started
