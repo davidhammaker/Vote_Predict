@@ -37,3 +37,13 @@ _Vote-Predict App_
     * Example URL: `'questions-list'` at `questions/`.
         * This is the URL at which serialized data from the _QuestionList_ view may be found.
     * There are several other URLs listed in the file, each of which points to a different view of the API.
+
+#### `tests/`
+* Directory for all `vp_app` tests.
+    * Each test file should follow the format `test_*.py`.
+    * These tests exist to ensure that _everything_ is always working as expected. This repository is linked to [Travis CI](https://travis-ci.org/davidhammaker/Vote_Predict_Backend) and [CodeCov](https://codecov.io/gh/davidhammaker/Vote_Predict_Backend), which both demonstrate the current state of the application from a testing perspective. The code should be error-free at all times, if possible, and the scope of the tests should cover as much code as possible.
+    * Click on any `test_*.py` file to see what tests are being run.
+        * If you look at `test_question_list.py`, you'll find several tests, including `test_get_questions()`, which simply tests that the API returns the _Question_ instances that are available. The test begins by creating a few dummy _Question_ instances, then requests the view (`self.url`, which equals the URL for the `questions-list` view) via an HTTP _GET_ request. The test then asserts two things:
+            1. The request's HTTP status code is `200 OK`, to verify that the API succeeded in responding to the GET request.
+            2. The returned data from the API is equal to the data we expected, which is a list containing the two dictionaries representing the _Question_ instances we created.
+        * All tests vary slightly from one another, but the above is a fairly simple example, and many tests in this repository will resemble it in some way, by checking status codes and returned data for expected results.
