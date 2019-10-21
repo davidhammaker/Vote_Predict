@@ -34,6 +34,12 @@ There is one environment variable that needs to be set up, called "Secret". If y
 1. Create the environment variable "SECRET" (preferred). There is an excellent tutorial for doing this on [Windows](https://www.youtube.com/watch?v=IolxqkL7cD8) or [Mac/Linux](https://www.youtube.com/watch?v=5iWhQWVXosU). If you are using Git Bash for Windows, the Mac/Linux tutorial may be more helpful. The string you use for "SECRET" can be anything, typically long and full of random characters. Remember to restart all terminals after modifying your environment variables.
 2. Open "vp_project/vp_project/settings.py" and replace `SECRET_KEY = os.environ.get("SECRET")` with `SECRET_KEY = "some_string"`. This is by far the easier method, but it is much less secure, especially if you're sharing your code with others.
 
+You'll need to migrate the database before you can create any Users, Questions, Answers, etc. From the `vp_project` directory (containing `manage.py`), perform the following:
+```shell
+$ python manage.py makemigrations
+$ python manage.py migrate
+```
+
 If you would like to access the project's [Django Admin Site](https://docs.djangoproject.com/en/2.2/ref/contrib/admin/), you'll need to create a superuser:
 ```shell
 $ django-admin createsuperuser
