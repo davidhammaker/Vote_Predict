@@ -42,6 +42,31 @@ class ResponseDetailTests(APITestCase):
         User.objects.create_user(username='test_user_1')
         User.objects.create_user(username='test_user_2')
 
+    def test_retrieve_response(self):
+        """
+        Users can get Responses.
+        """
+        question = Question.objects.get(id=1)
+        answer_1 = Answer.objects.get(id=1)
+        answer_2 = Answer.objects.get(id=2)
+        user = User.objects.get(id=1)
+        Response.objects.create(
+            user=user,
+            question=question,
+            vote=answer_1,
+            prediction=answer_2
+        )
+        request = self.client.get(self.url)
+        self.assertEqual(request.status_code, 200)
+        self.assertEqual(request.data, {
+            'id': 1,
+            'user': 1,
+            'question': 1,
+            'vote': 1,
+            'prediction': 2
+        })
+
+
     def test_update_response(self):
         """
         Users can update Responses.
