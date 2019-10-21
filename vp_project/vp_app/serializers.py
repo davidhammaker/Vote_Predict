@@ -42,6 +42,7 @@ class ResponseSerializer(serializers.ModelSerializer):
             Question.objects.get(id=question_id).answers.all()
         ]
         answer_ids = [answer.id for answer in answers]
+        request_method = self.context['request'].stream.method
 
         # Verify that the user has not previously responded to this
         # question.
@@ -49,23 +50,25 @@ class ResponseSerializer(serializers.ModelSerializer):
             user=self.context['request'].user.id,
             question=question_id
         ).first()
-        if existing_response:
+        if existing_response and request_method == 'POST':
             raise serializers.ValidationError(
                 'Users may submit only one response per question.'
             )
 
         # Verify that the response contains a valid vote.
-        if data['vote'].id not in answer_ids:
-            raise serializers.ValidationError(
-                f'Invalid vote. Choose one of the following: {answers}.'
-            )
+        if 'vote' in data.keys():
+            if data['vote'].id not in answer_ids:
+                raise serializers.ValidationError(
+                    f'Invalid vote. Choose one of the following: {answers}.'
+                )
 
         # Verify that the response contains a valid prediction.
-        if data['prediction'].id not in answer_ids:
-            raise serializers.ValidationError(
-                f'Invalid prediction. Choose one of the following: '
-                f'{answers}.'
-            )
+        if 'prediction' in data.keys():
+            if data['prediction'].id not in answer_ids:
+                raise serializers.ValidationError(
+                    f'Invalid prediction. Choose one of the following: '
+                    f'{answers}.'
+                )
 
         return data
 

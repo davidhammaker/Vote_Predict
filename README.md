@@ -63,7 +63,7 @@ URLs to try out:
 Please note that **tests are still in the works**. However, several tests have already been written. Ultimately, tests should cover as much of the code as possible.
 
 To test the application, navigate to the `vp_project` directory (containing `manage.py` and `pytest.ini`). From here, you can run `pytest` to test the code.
-* Alternatively, you can run `python manage.py test` in traditional Django fashion. But as testing for the app grows, there may come a point where this is no longer possible.
+* Alternatively, you can run `python manage.py test path/to/tests/` in traditional Django fashion. This method is a bit clunky and is not really recommended.
 
 ### The Code
 

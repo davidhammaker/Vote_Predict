@@ -48,6 +48,10 @@ class AnswerList(generics.ListAPIView):
 
 class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsStaffOrReadOnly, ]
+    authentication_classes = [
+        authentication.TokenAuthentication,
+        authentication.SessionAuthentication
+    ]
     serializer_class = AnswerSerializer
     queryset = Answer.objects.all()
 
