@@ -4,6 +4,7 @@ from .serializers import (
     QuestionSerializer,
     AnswerSerializer,
     ResponseSerializer,
+    ResultsSerializer
 )
 from .permissions import IsStaffOrReadOnly, IsOwnerOrReadOnly
 
@@ -94,3 +95,8 @@ class ResponseDetail(generics.RetrieveUpdateDestroyAPIView):
     ]
     serializer_class = ResponseSerializer
     queryset = Response.objects.all()
+
+
+class QuestionResults(generics.RetrieveAPIView):
+    serializer_class = ResultsSerializer
+    queryset = Question.objects.all()

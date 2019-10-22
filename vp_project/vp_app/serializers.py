@@ -81,3 +81,30 @@ class ResponseSerializer(serializers.ModelSerializer):
             'vote',
             'prediction'
         ]
+
+
+class ResultsSerializer(serializers.ModelSerializer):
+    results = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Question
+        fields = [
+            'id',
+            'results',
+        ]
+
+    def get_results(self, obj):
+        results = []
+        answers = [
+            answer for answer in
+            Question.objects.get(id=obj.id).answers.all()
+        ]
+        for answer in answers:
+            results.append({
+                'answer': answer.id,
+                'votes': Response.objects.filter(
+                    vote=answer.id).count(),
+                'predictions': Response.objects.filter(
+                    prediction=answer.id).count()
+            })
+        return results
