@@ -94,12 +94,9 @@ class ResultsSerializer(serializers.ModelSerializer):
             'results',
         ]
 
-    def get_results(self, obj):
+    def get_results(self, question):
         results = []
-        answers = [
-            answer for answer in
-            Question.objects.get(id=obj.id).answers.all()
-        ]
+        answers = [answer for answer in question.answers.all()]
         for answer in answers:
             results.append({
                 'answer': answer.id,
