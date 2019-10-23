@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.utils import timezone
 from rest_framework import serializers
 from .models import Question, Answer, Response
 
@@ -108,3 +109,62 @@ class ResultsSerializer(serializers.ModelSerializer):
                     prediction=answer.id).count()
             })
         return results
+
+
+class RecordSerializer(serializers.ModelSerializer):
+    total_responses = serializers.SerializerMethodField()
+    correct_predictions = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Response
+        fields = [
+            'id',
+            'total_responses',
+            'correct_predictions'
+        ]
+
+    def get_total_responses(self, user):
+        """
+        Get the User's total number of Responses, excluding Responses to
+        Questions that have not yet concluded.
+        """
+        total_responses = Response.objects.filter(
+            user=user,
+
+            # The keyword below basically means
+            # "question.date_concluded <= timezone.now()", to ensure
+            # that we only consider Questions that have not yet
+            # concluded.
+            question__date_concluded__lte=timezone.now()
+
+        ).count()
+        return total_responses
+
+    def get_correct_predictions(self, user):
+        """
+        Get the User's total number of Responses containing predictions
+        that match the Question's Answer receiving the most votes,
+        excluding Responses to Questions that have not yet concluded.
+        """
+        correct_predictions = 0
+        responses = Response.objects.filter(
+            user=user,
+
+            # The keyword below basically means
+            # "question.date_concluded <= timezone.now()", to ensure
+            # that we only consider Questions that have not yet
+            # concluded.
+            question__date_concluded__lte=timezone.now()
+
+        ).all()
+        for response in responses:
+            question = response.question
+            most_votes = 0
+            top_answer = None
+            for answer in question.answers.all():
+                if answer.votes.count() > most_votes:
+                    most_votes = answer.votes.count()
+                    top_answer = answer
+            if response.prediction == top_answer:
+                correct_predictions += 1
+        return correct_predictions

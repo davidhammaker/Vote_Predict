@@ -47,4 +47,9 @@ urlpatterns = [
         vp_app_views.QuestionResults.as_view(),
         name='question-results'
     ),
+    path(
+        'record/',
+        vp_app_views.UserRecord.as_view(),
+        name='record'
+    ),
 ]

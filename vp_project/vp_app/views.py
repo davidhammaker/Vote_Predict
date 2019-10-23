@@ -1,10 +1,13 @@
-from rest_framework import generics, authentication, permissions
+from django.contrib.auth.models import User
+from rest_framework import generics, authentication, permissions, views
+from rest_framework.response import Response as RestResponse
 from .models import Question, Answer, Response
 from .serializers import (
     QuestionSerializer,
     AnswerSerializer,
     ResponseSerializer,
-    ResultsSerializer
+    ResultsSerializer,
+    RecordSerializer
 )
 from .permissions import IsStaffOrReadOnly, IsOwnerOrReadOnly
 
@@ -100,3 +103,18 @@ class ResponseDetail(generics.RetrieveUpdateDestroyAPIView):
 class QuestionResults(generics.RetrieveAPIView):
     serializer_class = ResultsSerializer
     queryset = Question.objects.all()
+
+
+class UserRecord(views.APIView):
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication
+    ]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, format=None):
+        user = request.user
+        serializer = RecordSerializer(user)
+        return RestResponse(serializer.data)
+
+
