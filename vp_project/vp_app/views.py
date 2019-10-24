@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import generics, authentication, permissions, views
-from rest_framework.response import Response as RestResponse
-from .models import Question, Answer, Response
+from rest_framework.response import Response
+from .models import Question, Answer, Reply
 from .serializers import (
     QuestionSerializer,
     AnswerSerializer,
-    ResponseSerializer,
+    ReplySerializer,
     ResultsSerializer,
     RecordSerializer
 )
@@ -60,29 +60,29 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Answer.objects.all()
 
 
-class ResponseList(generics.ListAPIView):
-    serializer_class = ResponseSerializer
-    queryset = Response.objects.all()
+class ReplyList(generics.ListAPIView):
+    serializer_class = ReplySerializer
+    queryset = Reply.objects.all()
 
 
-class QuestionResponses(generics.ListCreateAPIView):
+class QuestionReplies(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
     authentication_classes = [
         authentication.TokenAuthentication,
         authentication.SessionAuthentication,
     ]
-    serializer_class = ResponseSerializer
+    serializer_class = ReplySerializer
 
     def get_queryset(self):
         """
         Display all responses to a question with id 'question_id'.
         """
         question_id = self.kwargs['question_id']
-        return Response.objects.filter(question=question_id)
+        return Reply.objects.filter(question=question_id)
 
     def perform_create(self, serializer):
         """
-        Relate Users and Questions to Responses.
+        Relate Users and Questions to Replies.
         """
         serializer.save(
             user=self.request.user,
@@ -90,14 +90,14 @@ class QuestionResponses(generics.ListCreateAPIView):
         )
 
 
-class ResponseDetail(generics.RetrieveUpdateDestroyAPIView):
+class ReplyDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly, ]
     authentication_classes = [
         authentication.TokenAuthentication,
         authentication.SessionAuthentication,
     ]
-    serializer_class = ResponseSerializer
-    queryset = Response.objects.all()
+    serializer_class = ReplySerializer
+    queryset = Reply.objects.all()
 
 
 class QuestionResults(generics.RetrieveAPIView):
@@ -115,6 +115,6 @@ class UserRecord(views.APIView):
     def get(self, request, format=None):
         user = request.user
         serializer = RecordSerializer(user)
-        return RestResponse(serializer.data)
+        return Response(serializer.data)
 
 

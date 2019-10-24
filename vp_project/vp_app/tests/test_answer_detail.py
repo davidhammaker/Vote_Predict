@@ -27,16 +27,16 @@ class AnswerListTests(APITestCase):
         """
         Users cannot access a non-existent Answer.
         """
-        request = self.client.get(reverse('answer-detail', args=[2]))
-        self.assertEqual(request.status_code, 404)
+        response = self.client.get(reverse('answer-detail', args=[2]))
+        self.assertEqual(response.status_code, 404)
 
     def test_get_answer(self):
         """
         Users can access an Answer.
         """
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, {
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
             'id': 1,
             'content': 'answer 1',
             'question': 1
@@ -50,9 +50,9 @@ class AnswerListTests(APITestCase):
         user.is_staff = True
         self.client.force_authenticate(user=user)
         data = {'content': 'answer 2'}
-        request = self.client.patch(self.url, data)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, {
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
             'id': 1,
             'content': 'answer 2',
             'question': 1
@@ -65,8 +65,8 @@ class AnswerListTests(APITestCase):
         user = User.objects.create_user(username='test_user')
         user.is_staff = True
         self.client.force_authenticate(user=user)
-        request = self.client.delete(self.url)
-        self.assertEqual(request.status_code, 204)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 204)
 
     def test_nonstaff_update_answer(self):
         """
@@ -75,8 +75,8 @@ class AnswerListTests(APITestCase):
         user = User.objects.create_user(username='test_user')
         self.client.force_authenticate(user=user)
         data = {'content': 'answer 2'}
-        request = self.client.patch(self.url, data)
-        self.assertEqual(request.status_code, 403)
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, 403)
 
     def test_nonstaff_delete_answer(self):
         """
@@ -84,21 +84,21 @@ class AnswerListTests(APITestCase):
         """
         user = User.objects.create_user(username='test_user')
         self.client.force_authenticate(user=user)
-        request = self.client.delete(self.url)
-        self.assertEqual(request.status_code, 403)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 403)
 
     def test_anonymous_update_answer(self):
         """
         Anonymous users cannot update an Answer.
         """
         data = {'content': 'answer 2'}
-        request = self.client.patch(self.url, data)
-        self.assertEqual(request.status_code, 401)
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, 401)
 
     def test_anonymous_delete_answer(self):
         """
         Anonymous users cannot delete an Answer.
         """
-        request = self.client.delete(self.url)
-        self.assertEqual(request.status_code, 401)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 401)
 

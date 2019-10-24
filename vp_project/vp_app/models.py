@@ -24,15 +24,15 @@ class Answer(models.Model):
         return self.content
 
 
-class Response(models.Model):
+class Reply(models.Model):
     user = models.ForeignKey(
         User,
-        related_name='responses',
+        related_name='replies',
         on_delete=models.CASCADE
     )
     question = models.ForeignKey(
         Question,
-        related_name='responses',
+        related_name='replies',
         on_delete=models.CASCADE
     )
     vote = models.ForeignKey(
@@ -48,16 +48,3 @@ class Response(models.Model):
 
     def __str__(self):
         return self.question
-
-
-class Record(models.Model):
-    user = models.OneToOneField(
-        User,
-        related_name='record',
-        on_delete=models.CASCADE
-    )
-    total_responses = models.IntegerField()
-    correct_predictions = models.IntegerField()
-
-    def __str__(self):
-        return self.user

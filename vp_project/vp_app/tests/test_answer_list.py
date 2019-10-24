@@ -23,9 +23,9 @@ class AnswerListTests(APITestCase):
         If no Answers have been created, the API should return an empty
         list.
         """
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, [])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
 
     def test_get_questions(self):
         """
@@ -40,9 +40,9 @@ class AnswerListTests(APITestCase):
             content='answer 2',
             question=question
         )
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, [
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [
             {
                 'id': 1,
                 'content': 'answer 1',

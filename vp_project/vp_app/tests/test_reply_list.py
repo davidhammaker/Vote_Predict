@@ -3,14 +3,14 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 import pytz
 from rest_framework.test import APITestCase
-from vp_app.models import Question, Answer, Response
+from vp_app.models import Question, Answer, Reply
 
 
 date = datetime(2019, 10, 19, 4, 25, tzinfo=pytz.utc)
 
 
-class ResponseListTests(APITestCase):
-    url = reverse('response-list')
+class ReplyListTests(APITestCase):
+    url = reverse('reply-list')
 
     def setUp(self) -> None:
         question = Question.objects.create(
@@ -29,39 +29,39 @@ class ResponseListTests(APITestCase):
         User.objects.create_user(username='test_user_1')
         User.objects.create_user(username='test_user_2')
 
-    def test_no_responses(self):
+    def test_no_replies(self):
         """
-        If no Responses have been created, the API should return an
+        If no Replies have been created, the API should return an
         empty list.
         """
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, [])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
 
-    def test_get_responses(self):
+    def test_get_replies(self):
         """
-        If any Responses exist, the API should list them.
+        If any Replies exist, the API should list them.
         """
         question = Question.objects.get(id=1)
         answer_1 = Answer.objects.get(id=1)
         answer_2 = Answer.objects.get(id=2)
         user_1 = User.objects.get(id=1)
         user_2 = User.objects.get(id=2)
-        Response.objects.create(
+        Reply.objects.create(
             user=user_1,
             question=question,
             vote=answer_1,
             prediction=answer_2
         )
-        Response.objects.create(
+        Reply.objects.create(
             user=user_2,
             question=question,
             vote=answer_2,
             prediction=answer_1
         )
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, [
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [
             {
                 'id': 1,
                 'user': 1,

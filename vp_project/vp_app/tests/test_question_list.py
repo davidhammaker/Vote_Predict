@@ -17,9 +17,9 @@ class QuestionListTests(APITestCase):
         If no Questions have been created, the API should return an
         empty list.
         """
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, [])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
 
     def test_get_questions(self):
         """
@@ -35,9 +35,9 @@ class QuestionListTests(APITestCase):
             date_published=date,
             date_concluded=(date + timedelta(days=1))
         )
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, [
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [
             {
                 'id': 1,
                 'content': 'question 1',
@@ -85,9 +85,9 @@ class QuestionListTests(APITestCase):
             content='answer 4',
             question=question_2
         )
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, [
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [
             {
                 'id': 1,
                 'content': 'question 1',
@@ -117,12 +117,12 @@ class QuestionListTests(APITestCase):
         user = User.objects.create_user(username='test_user')
         user.is_staff = True
         self.client.force_authenticate(user=user)
-        request = self.client.post(self.url, {
+        response = self.client.post(self.url, {
             'content': 'question 1',
             'date_published': '2019-10-19T04:25:00Z',
             'date_concluded': '2019-10-20T04:25:00Z',
         })
-        self.assertEqual(request.status_code, 201)
+        self.assertEqual(response.status_code, 201)
 
     def test_nonstaff_create_question(self):
         """
@@ -130,20 +130,20 @@ class QuestionListTests(APITestCase):
         """
         user = User.objects.create_user(username='test_user')
         self.client.force_authenticate(user=user)
-        request = self.client.post(self.url, {
+        response = self.client.post(self.url, {
             'content': 'question 1',
             'date_published': '2019-10-19T04:25:00Z',
             'date_concluded': '2019-10-20T04:25:00Z',
         })
-        self.assertEqual(request.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_anonymous_create_question(self):
         """
         Anonymous users may not create new Questions.
         """
-        request = self.client.post(self.url, {
+        response = self.client.post(self.url, {
             'content': 'question 1',
             'date_published': '2019-10-19T04:25:00Z',
             'date_concluded': '2019-10-20T04:25:00Z',
         })
-        self.assertEqual(request.status_code, 401)
+        self.assertEqual(response.status_code, 401)

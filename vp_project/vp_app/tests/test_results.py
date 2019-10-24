@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 import pytz
 from rest_framework.test import APITestCase
-from vp_app.models import Question, Answer, Response
+from vp_app.models import Question, Answer, Reply
 
 
 date = datetime(2019, 10, 19, 4, 25, tzinfo=pytz.utc)
@@ -61,58 +61,58 @@ class QuestionResultsTests(APITestCase):
         user_7 = User.objects.get(id=7)
         answer_1 = Answer.objects.get(id=1)
         answer_2 = Answer.objects.get(id=2)
-        Response.objects.create(
+        Reply.objects.create(
             question=question,
             user=user_1,
             vote=answer_1,
             prediction=answer_1
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question,
             user=user_2,
             vote=answer_1,
             prediction=answer_1
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question,
             user=user_3,
             vote=answer_2,
             prediction=answer_1
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question,
             user=user_4,
             vote=answer_2,
             prediction=answer_1
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question,
             user=user_5,
             vote=answer_1,
             prediction=answer_1
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question,
             user=user_6,
             vote=answer_1,
             prediction=answer_2
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question,
             user=user_7,
             vote=answer_2,
             prediction=answer_2
         )
-        # Dummy response, which we expect to be excluded:
-        Response.objects.create(
+        # Dummy reply, which we expect to be excluded:
+        Reply.objects.create(
             question=Question.objects.get(id=2),
             user=user_7,
             vote=Answer.objects.get(id=3),
             prediction=Answer.objects.get(id=4)
         )
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, {
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
             'id': 1,
             'results': [
                 {
@@ -130,18 +130,18 @@ class QuestionResultsTests(APITestCase):
 
     def test_get_empty_results(self):
         """
-        Users can retrieve results, even if there were no responses.
+        Users can retrieve results, even if there were no replies.
         """
-        # Dummy response, which we expect to be excluded:
-        Response.objects.create(
+        # Dummy reply, which we expect to be excluded:
+        Reply.objects.create(
             question=Question.objects.get(id=2),
             user=User.objects.get(id=1),
             vote=Answer.objects.get(id=3),
             prediction=Answer.objects.get(id=4)
         )
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, {
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
             'id': 1,
             'results': [
                 {

@@ -23,18 +23,18 @@ class QuestionDetailTests(APITestCase):
         """
         Users cannot access a non-existent Question.
         """
-        request = self.client.get(
+        response = self.client.get(
             reverse('question-detail', args=[2])
         )
-        self.assertEqual(request.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_get_question(self):
         """
         Users can access a Question.
         """
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, {
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
             'id': 1,
             'content': 'question 1',
             'date_published': '2019-10-19T04:25:00Z',
@@ -50,9 +50,9 @@ class QuestionDetailTests(APITestCase):
         user.is_staff = True
         self.client.force_authenticate(user=user)
         data = {'content': 'question 2'}
-        request = self.client.put(self.url, data)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, {
+        response = self.client.put(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
             'id': 1,
             'content': 'question 2',
             'date_published': '2019-10-19T04:25:00Z',
@@ -67,8 +67,8 @@ class QuestionDetailTests(APITestCase):
         user = User.objects.create_user(username='test_user')
         user.is_staff = True
         self.client.force_authenticate(user=user)
-        request = self.client.delete(self.url)
-        self.assertEqual(request.status_code, 204)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 204)
 
     def test_nonstaff_update_question(self):
         """
@@ -77,8 +77,8 @@ class QuestionDetailTests(APITestCase):
         user = User.objects.create_user(username='test_user')
         self.client.force_authenticate(user=user)
         data = {'content': 'question 2'}
-        request = self.client.put(self.url, data)
-        self.assertEqual(request.status_code, 403)
+        response = self.client.put(self.url, data)
+        self.assertEqual(response.status_code, 403)
 
     def test_nonstaff_delete_question(self):
         """
@@ -86,20 +86,20 @@ class QuestionDetailTests(APITestCase):
         """
         user = User.objects.create_user(username='test_user')
         self.client.force_authenticate(user=user)
-        request = self.client.delete(self.url)
-        self.assertEqual(request.status_code, 403)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 403)
 
     def test_anonymous_update_question(self):
         """
         Anonymous users cannot update a Question.
         """
         data = {'content': 'question 2'}
-        request = self.client.put(self.url, data)
-        self.assertEqual(request.status_code, 403)
+        response = self.client.put(self.url, data)
+        self.assertEqual(response.status_code, 403)
 
     def test_anonymous_delete_question(self):
         """
         Anonymous users cannot delete a Question.
         """
-        request = self.client.delete(self.url)
-        self.assertEqual(request.status_code, 403)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 403)

@@ -28,19 +28,19 @@ urlpatterns = [
         name='answer-detail'
     ),
     path(
-        'responses/',
-        vp_app_views.ResponseList.as_view(),
-        name='response-list'
+        'replies/',
+        vp_app_views.ReplyList.as_view(),
+        name='reply-list'
     ),
     path(
-        'questions/<int:question_id>/responses/',
-        vp_app_views.QuestionResponses.as_view(),
-        name='question-responses'
+        'questions/<int:question_id>/replies/',
+        vp_app_views.QuestionReplies.as_view(),
+        name='question-replies'
     ),
     path(
-        'questions/<int:question_id>/responses/<int:pk>/',
-        vp_app_views.ResponseDetail.as_view(),
-        name='response-detail'
+        'questions/<int:question_id>/replies/<int:pk>/',
+        vp_app_views.ReplyDetail.as_view(),
+        name='reply-detail'
     ),
     path(
         'questions/<int:pk>/results/',

@@ -1,7 +1,6 @@
-from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework import serializers
-from .models import Question, Answer, Response
+from .models import Question, Answer, Reply
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -26,13 +25,13 @@ class AnswerSerializer(serializers.ModelSerializer):
         ]
 
 
-class ResponseSerializer(serializers.ModelSerializer):
+class ReplySerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.id')
     question = serializers.ReadOnlyField(source='question.id')
 
     def validate(self, data):
         """
-        Check that a user has not yet submitted a response for the given
+        Check that a user has not yet submitted a reply for the given
         question. Users may only respond once per question. Check that
         the provided vote and prediction pertain to the question.
         """
@@ -47,23 +46,23 @@ class ResponseSerializer(serializers.ModelSerializer):
 
         # Verify that the user has not previously responded to this
         # question.
-        existing_response = Response.objects.filter(
+        existing_reply = Reply.objects.filter(
             user=self.context['request'].user.id,
             question=question_id
         ).first()
-        if existing_response and request_method == 'POST':
+        if existing_reply and request_method == 'POST':
             raise serializers.ValidationError(
-                'Users may submit only one response per question.'
+                'Users may submit only one reply per question.'
             )
 
-        # Verify that the response contains a valid vote.
+        # Verify that the reply contains a valid vote.
         if 'vote' in data.keys():
             if data['vote'].id not in answer_ids:
                 raise serializers.ValidationError(
                     f'Invalid vote. Choose one of the following: {answers}.'
                 )
 
-        # Verify that the response contains a valid prediction.
+        # Verify that the reply contains a valid prediction.
         if 'prediction' in data.keys():
             if data['prediction'].id not in answer_ids:
                 raise serializers.ValidationError(
@@ -74,7 +73,7 @@ class ResponseSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        model = Response
+        model = Reply
         fields = [
             'id',
             'user',
@@ -100,32 +99,32 @@ class ResultsSerializer(serializers.ModelSerializer):
         for answer in answers:
             results.append({
                 'answer': answer.id,
-                'votes': Response.objects.filter(
+                'votes': Reply.objects.filter(
                     vote=answer.id).count(),
-                'predictions': Response.objects.filter(
+                'predictions': Reply.objects.filter(
                     prediction=answer.id).count()
             })
         return results
 
 
 class RecordSerializer(serializers.ModelSerializer):
-    total_responses = serializers.SerializerMethodField()
+    total_replies = serializers.SerializerMethodField()
     correct_predictions = serializers.SerializerMethodField()
 
     class Meta:
-        model = Response
+        model = Reply
         fields = [
             'id',
-            'total_responses',
+            'total_replies',
             'correct_predictions'
         ]
 
-    def get_total_responses(self, user):
+    def get_total_replies(self, user):
         """
-        Get the User's total number of Responses, excluding Responses to
+        Get the User's total number of Replies, excluding Replies to
         Questions that have not yet concluded.
         """
-        total_responses = Response.objects.filter(
+        total_replies = Reply.objects.filter(
             user=user,
 
             # The keyword below basically means
@@ -135,16 +134,16 @@ class RecordSerializer(serializers.ModelSerializer):
             question__date_concluded__lte=timezone.now()
 
         ).count()
-        return total_responses
+        return total_replies
 
     def get_correct_predictions(self, user):
         """
-        Get the User's total number of Responses containing predictions
+        Get the User's total number of Replies containing predictions
         that match the Question's Answer receiving the most votes,
-        excluding Responses to Questions that have not yet concluded.
+        excluding Replies to Questions that have not yet concluded.
         """
         correct_predictions = 0
-        responses = Response.objects.filter(
+        replies = Reply.objects.filter(
             user=user,
 
             # The keyword below basically means
@@ -154,14 +153,14 @@ class RecordSerializer(serializers.ModelSerializer):
             question__date_concluded__lte=timezone.now()
 
         ).all()
-        for response in responses:
-            question = response.question
+        for reply in replies:
+            question = reply.question
             most_votes = 0
             top_answer = None
             for answer in question.answers.all():
                 if answer.votes.count() > most_votes:
                     most_votes = answer.votes.count()
                     top_answer = answer
-            if response.prediction == top_answer:
+            if reply.prediction == top_answer:
                 correct_predictions += 1
         return correct_predictions

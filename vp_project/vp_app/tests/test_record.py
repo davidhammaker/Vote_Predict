@@ -1,10 +1,9 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
-import pytz
 from rest_framework.test import APITestCase
-from vp_app.models import Question, Answer, Response
+from vp_app.models import Question, Answer, Reply
 
 
 date_today = timezone.now()
@@ -17,6 +16,9 @@ class RecordTests(APITestCase):
     url = reverse('record')
 
     def setUp(self) -> None:
+        # Note: It's possible that this setUp would have been easier
+        # with factories.
+        # https://www.django-rest-framework.org/api-guide/testing/#apirequestfactory
 
         # Questions and Answers:
         question_1 = Question.objects.create(
@@ -81,78 +83,78 @@ class RecordTests(APITestCase):
         user_2 = User.objects.create_user(username='test_user_2')
         user_3 = User.objects.create_user(username='test_user_3')
 
-        # User 1 Responses
-        Response.objects.create(
+        # User 1 Replies
+        Reply.objects.create(
             question=question_1,
             user=user_1,
             vote=answer_1,
             prediction=answer_1
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_2,
             user=user_1,
             vote=answer_3,
             prediction=answer_3
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_3,
             user=user_1,
             vote=answer_5,
             prediction=answer_5
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_4,
             user=user_1,
             vote=answer_7,
             prediction=answer_7
         )
 
-        # User 2 Responses
-        Response.objects.create(
+        # User 2 Replies
+        Reply.objects.create(
             question=question_1,
             user=user_2,
             vote=answer_1,
             prediction=answer_1
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_2,
             user=user_2,
             vote=answer_3,
             prediction=answer_4
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_3,
             user=user_2,
             vote=answer_6,
             prediction=answer_5
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_4,
             user=user_2,
             vote=answer_7,
             prediction=answer_8
         )
 
-        # User 3 Responses
-        Response.objects.create(
+        # User 3 Replies
+        Reply.objects.create(
             question=question_1,
             user=user_3,
             vote=answer_1,
             prediction=answer_1
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_2,
             user=user_3,
             vote=answer_3,
             prediction=answer_3
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_3,
             user=user_3,
             vote=answer_6,
             prediction=answer_5
         )
-        Response.objects.create(
+        Reply.objects.create(
             question=question_4,
             user=user_3,
             vote=answer_7,
@@ -165,11 +167,11 @@ class RecordTests(APITestCase):
         """
         user = User.objects.get(id=1)
         self.client.force_authenticate(user)
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 200)
-        self.assertEqual(request.data, {
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
             "id": 1,
-            "total_responses": 3,
+            "total_replies": 3,
             "correct_predictions": 2
         })
 
@@ -177,5 +179,5 @@ class RecordTests(APITestCase):
         """
         Anonymous users cannot retrieve records.
         """
-        request = self.client.get(self.url)
-        self.assertEqual(request.status_code, 403)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
