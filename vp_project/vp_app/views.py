@@ -1,5 +1,11 @@
-from django.contrib.auth.models import User
-from rest_framework import generics, authentication, permissions, views
+from django.utils import timezone
+from rest_framework import (
+    generics,
+    authentication,
+    permissions,
+    views,
+    status
+)
 from rest_framework.response import Response
 from .models import Question, Answer, Reply
 from .serializers import (
@@ -12,6 +18,7 @@ from .serializers import (
 from .permissions import IsStaffOrReadOnly, IsOwnerOrReadOnly
 
 
+# TODO: Make sure only staff can see unpublished Questions
 class QuestionList(generics.ListCreateAPIView):
     permission_classes = [IsStaffOrReadOnly, ]
     authentication_classes = [
@@ -66,13 +73,14 @@ class ReplyList(generics.ListAPIView):
 
 
 class QuestionReplies(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
     authentication_classes = [
         authentication.TokenAuthentication,
         authentication.SessionAuthentication,
     ]
     serializer_class = ReplySerializer
 
+    # TODO: User can only access own reply until 'date_concluded'
     def get_queryset(self):
         """
         Display all responses to a question with id 'question_id'.
@@ -88,6 +96,32 @@ class QuestionReplies(generics.ListCreateAPIView):
             user=self.request.user,
             question=Question.objects.get(id=self.kwargs['question_id'])
         )
+
+    # TODO: Test
+    def get(self, request, *args, **kwargs):
+        """
+        If the current date/time is after the Question was published,
+        perform 'get()' as normal. Otherwise, return a 404.
+        """
+        question = Question.objects.get(id=self.kwargs['question_id'])
+        if question.date_published <= timezone.now() \
+                or request.user.is_staff:
+            return super().get(request, *args, **kwargs)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # TODO: Test
+    def post(self, request, *args, **kwargs):
+        """
+        If the current date/time is between the Question publication
+        and conclusion dates, perform the 'post()' as normal. Otherwise,
+        return a 405.
+        """
+        question = Question.objects.get(id=self.kwargs['question_id'])
+        if question.date_published <= timezone.now() \
+                <= question.date_concluded:
+            return super().post(request, *args, **kwargs)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 
 class ReplyDetail(generics.RetrieveUpdateDestroyAPIView):
