@@ -97,6 +97,8 @@ class QuestionReplies(generics.ListCreateAPIView):
             question=Question.objects.get(id=self.kwargs['question_id'])
         )
 
+
+
     # TODO: Test
     def get(self, request, *args, **kwargs):
         """
@@ -108,20 +110,6 @@ class QuestionReplies(generics.ListCreateAPIView):
                 or request.user.is_staff:
             return super().get(request, *args, **kwargs)
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-    # TODO: Test
-    def post(self, request, *args, **kwargs):
-        """
-        If the current date/time is between the Question publication
-        and conclusion dates, perform the 'post()' as normal. Otherwise,
-        return a 405.
-        """
-        question = Question.objects.get(id=self.kwargs['question_id'])
-        if question.date_published <= timezone.now() \
-                <= question.date_concluded:
-            return super().post(request, *args, **kwargs)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
 
 class ReplyDetail(generics.RetrieveUpdateDestroyAPIView):

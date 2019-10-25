@@ -1,12 +1,12 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.urls import reverse
+from django.utils import timezone
 from django.contrib.auth.models import User
-import pytz
 from rest_framework.test import APITestCase
 from vp_app.models import Question, Answer, Reply
 
 
-date = datetime(2019, 10, 19, 4, 25, tzinfo=pytz.utc)
+date = timezone.now() - timedelta(days=1)
 
 
 class ReplyDetailTests(APITestCase):
@@ -16,7 +16,7 @@ class ReplyDetailTests(APITestCase):
         question_1 = Question.objects.create(
             content='question 1',
             date_published=date,
-            date_concluded=(date + timedelta(days=1))
+            date_concluded=(date + timedelta(days=2))
         )
         Answer.objects.create(
             content='answer 1',
@@ -29,7 +29,7 @@ class ReplyDetailTests(APITestCase):
         question_2 = Question.objects.create(
             content='question 2',
             date_published=date,
-            date_concluded=(date + timedelta(days=1))
+            date_concluded=(date + timedelta(days=2))
         )
         Answer.objects.create(
             content='answer 3',

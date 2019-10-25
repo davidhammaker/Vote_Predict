@@ -1,5 +1,6 @@
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.permissions import SAFE_METHODS
 from .models import Question, Answer, Reply
 
 
@@ -37,10 +38,8 @@ class ReplySerializer(serializers.ModelSerializer):
         """
         question_id = self.context['request'] \
             .parser_context['kwargs']['question_id']
-        answers = [
-            answer for answer in
-            Question.objects.get(id=question_id).answers.all()
-        ]
+        question = Question.objects.get(id=question_id)
+        answers = [answer for answer in question.answers.all()]
         answer_ids = [answer.id for answer in answers]
         request_method = self.context['request'].stream.method
 
@@ -68,6 +67,16 @@ class ReplySerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f'Invalid prediction. Choose one of the following: '
                     f'{answers}.'
+                )
+
+        # TODO: Test (POST and PUT)
+        # Verify that non-safe request methods are not allowed after
+        # conclusion. This excludes DELETE, which has no validation.
+        if request_method not in SAFE_METHODS:
+            if timezone.now() >= question.date_concluded:
+                raise serializers.ValidationError(
+                    'This question has concluded, and replies may not '
+                    'be created or modified.'
                 )
 
         return data
