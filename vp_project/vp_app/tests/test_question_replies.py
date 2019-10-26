@@ -15,6 +15,8 @@ date_day_after_tomorrow = date_today + timedelta(days=2)
 
 class QuestionRepliesTests(APITestCase):
     url = reverse('question-replies', args=[1])
+    url_concluded_question = reverse('question-replies', args=[3])
+    url_unpublished_question = reverse('question-replies', args=[4])
 
     def setUp(self) -> None:
         question_1 = Question.objects.create(
@@ -43,6 +45,37 @@ class QuestionRepliesTests(APITestCase):
             content='answer 4',
             question=question_2
         )
+
+        # Concluded Question
+        question_3 = Question.objects.create(
+            content='question 3',
+            date_published=date_two_days_ago,
+            date_concluded=date_yesterday
+        )
+        Answer.objects.create(
+            content='answer 5',
+            question=question_3
+        )
+        Answer.objects.create(
+            content='answer 6',
+            question=question_3
+        )
+
+        # Unpublished Question
+        question_4 = Question.objects.create(
+            content='question 4',
+            date_published=date_tomorrow,
+            date_concluded=date_day_after_tomorrow
+        )
+        Answer.objects.create(
+            content='answer 7',
+            question=question_4
+        )
+        Answer.objects.create(
+            content='answer 8',
+            question=question_4
+        )
+
         User.objects.create_user(username='test_user_1')
         User.objects.create_user(username='test_user_2')
 
@@ -202,3 +235,33 @@ class QuestionRepliesTests(APITestCase):
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 400)
         self.assertIn('Invalid prediction.', str(response.data))
+
+    def test_new_reply_after_conclusion(self):
+        """
+        Users cannot create new Replies after a Question concludes.
+        """
+        user = User.objects.get(id=1)
+        self.client.force_authenticate(user=user)
+        data = {'vote': 5, 'prediction': 6}
+        response = self.client.post(self.url_concluded_question, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('question has concluded', str(response.data))
+
+    def test_get_reply_unpublished_conclusion(self):
+        """
+        Users cannot get Replies to an unpublished Question.
+        """
+        user = User.objects.get(id=1)
+        self.client.force_authenticate(user=user)
+        response = self.client.get(self.url_unpublished_question)
+        self.assertEqual(response.status_code, 404)
+
+    def test_staff_get_reply_unpublished_conclusion(self):
+        """
+        Staff Users cannot get Replies to an unpublished Question.
+        """
+        user = User.objects.create_user(username='staff_user')
+        user.is_staff = True
+        self.client.force_authenticate(user=user)
+        response = self.client.get(self.url_unpublished_question)
+        self.assertEqual(response.status_code, 200)

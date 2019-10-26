@@ -11,6 +11,7 @@ date = timezone.now() - timedelta(days=1)
 
 class ReplyDetailTests(APITestCase):
     url = reverse('reply-detail', args=[1, 1])
+    url_question_concluded = reverse('reply-detail', args=[2, 1])
 
     def setUp(self) -> None:
         question_1 = Question.objects.create(
@@ -26,10 +27,12 @@ class ReplyDetailTests(APITestCase):
             content='answer 2',
             question=question_1
         )
+
+        # Concluded Question
         question_2 = Question.objects.create(
             content='question 2',
-            date_published=date,
-            date_concluded=(date + timedelta(days=2))
+            date_published=(date - timedelta(days=1)),
+            date_concluded=date
         )
         Answer.objects.create(
             content='answer 3',
@@ -65,7 +68,6 @@ class ReplyDetailTests(APITestCase):
             'vote': 1,
             'prediction': 2
         })
-
 
     def test_update_reply(self):
         """
@@ -225,3 +227,33 @@ class ReplyDetailTests(APITestCase):
         )
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, 401)
+
+    def test_update_reply_concluded_question(self):
+        """
+        Users cannot update Replies to concluded questions.
+        """
+        question = Question.objects.get(id=2)
+        answer_1 = Answer.objects.get(id=3)
+        answer_2 = Answer.objects.get(id=4)
+        user = User.objects.get(id=1)
+        self.client.force_authenticate(user=user)
+        Reply.objects.create(
+            user=user,
+            question=question,
+            vote=answer_1,
+            prediction=answer_2
+        )
+        data = {'vote': 3}
+        response = self.client.patch(
+            self.url_question_concluded,
+            data
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('question has concluded', str(response.data))
+        data_2 = {'vote': 3, 'prediction': 4}
+        response_2 = self.client.put(
+            self.url_question_concluded,
+            data_2
+        )
+        self.assertEqual(response_2.status_code, 400)
+        self.assertIn('question has concluded', str(response_2.data))

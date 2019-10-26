@@ -69,7 +69,6 @@ class ReplySerializer(serializers.ModelSerializer):
                     f'{answers}.'
                 )
 
-        # TODO: Test (POST and PUT)
         # Verify that non-safe request methods are not allowed after
         # conclusion. This excludes DELETE, which has no validation.
         if request_method not in SAFE_METHODS:

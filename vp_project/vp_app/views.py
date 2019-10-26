@@ -18,7 +18,6 @@ from .serializers import (
 from .permissions import IsStaffOrReadOnly, IsOwnerOrReadOnly
 
 
-# TODO: Make sure only staff can see unpublished Questions
 class QuestionList(generics.ListCreateAPIView):
     permission_classes = [IsStaffOrReadOnly, ]
     authentication_classes = [
@@ -80,7 +79,6 @@ class QuestionReplies(generics.ListCreateAPIView):
     ]
     serializer_class = ReplySerializer
 
-    # TODO: User can only access own reply until 'date_concluded'
     def get_queryset(self):
         """
         Display all responses to a question with id 'question_id'.
@@ -97,9 +95,6 @@ class QuestionReplies(generics.ListCreateAPIView):
             question=Question.objects.get(id=self.kwargs['question_id'])
         )
 
-
-
-    # TODO: Test
     def get(self, request, *args, **kwargs):
         """
         If the current date/time is after the Question was published,
