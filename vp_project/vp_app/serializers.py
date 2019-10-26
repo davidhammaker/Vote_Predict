@@ -36,8 +36,24 @@ class ReplySerializer(serializers.ModelSerializer):
         question. Users may only respond once per question. Check that
         the provided vote and prediction pertain to the question.
         """
-        question_id = self.context['request'] \
-            .parser_context['kwargs']['question_id']
+
+        # The 'QuestionReplies' view queryset contains all Replies for a
+        # single question. This view will have 'question_id' passed in
+        # the URL.
+        if 'question_id' in \
+                self.context['request'].parser_context['kwargs']:
+            question_id = self.context['request'] \
+                .parser_context['kwargs']['question_id']
+
+        # The 'ReplyDetail' view will have a 'pk' passed in the URL, not
+        # 'question_id'. We can use that 'pk' to get the associated
+        # 'question_id'.
+        else:
+            reply_id = \
+                self.context['request'].parser_context['kwargs']['pk']
+            question_id = Reply.objects.get(id=reply_id).question.id
+
+        # Use 'question_id' to find associated Question and Answers.
         question = Question.objects.get(id=question_id)
         answers = [answer for answer in question.answers.all()]
         answer_ids = [answer.id for answer in answers]
@@ -47,7 +63,7 @@ class ReplySerializer(serializers.ModelSerializer):
         # question.
         existing_reply = Reply.objects.filter(
             user=self.context['request'].user.id,
-            question=question_id
+            question=question
         ).first()
         if existing_reply and request_method == 'POST':
             raise serializers.ValidationError(

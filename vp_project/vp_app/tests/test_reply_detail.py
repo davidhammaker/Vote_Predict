@@ -10,8 +10,7 @@ date = timezone.now() - timedelta(days=1)
 
 
 class ReplyDetailTests(APITestCase):
-    url = reverse('reply-detail', args=[1, 1])
-    url_question_concluded = reverse('reply-detail', args=[2, 1])
+    url = reverse('reply-detail', args=[1])
 
     def setUp(self) -> None:
         question_1 = Question.objects.create(
@@ -244,16 +243,10 @@ class ReplyDetailTests(APITestCase):
             prediction=answer_2
         )
         data = {'vote': 3}
-        response = self.client.patch(
-            self.url_question_concluded,
-            data
-        )
+        response = self.client.patch(self.url, data)
         self.assertEqual(response.status_code, 400)
         self.assertIn('question has concluded', str(response.data))
         data_2 = {'vote': 3, 'prediction': 4}
-        response_2 = self.client.put(
-            self.url_question_concluded,
-            data_2
-        )
+        response_2 = self.client.put(self.url, data_2)
         self.assertEqual(response_2.status_code, 400)
         self.assertIn('question has concluded', str(response_2.data))

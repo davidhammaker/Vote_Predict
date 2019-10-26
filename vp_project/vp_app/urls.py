@@ -38,7 +38,7 @@ urlpatterns = [
         name='question-replies'
     ),
     path(
-        'questions/<int:question_id>/replies/<int:pk>/',
+        'replies/<int:pk>/',
         vp_app_views.ReplyDetail.as_view(),
         name='reply-detail'
     ),
