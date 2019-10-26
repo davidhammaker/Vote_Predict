@@ -58,7 +58,7 @@ The site up and running! Navigate to any of the URLs below to find out.
 * If you created a superuser, you can log into http://localhost:8000/admin/ to access the admin site.
 
 URLs to try out:
-* http://localhost:8000/user/
+* http://localhost:8000/users/
 * http://localhost:8000/questions/
 * http://localhost:8000/api-token-auth/
     * `api-token-auth/` accepts POST requests to log in users.
