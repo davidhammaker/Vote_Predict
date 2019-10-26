@@ -4,5 +4,10 @@ from . import views as users_views
 
 urlpatterns = [
     path('api-token-auth/', authtoken_views.obtain_auth_token),
-    path('user/', users_views.UserCreate.as_view(), name='create-user')
+    path('users/', users_views.UserCreate.as_view(), name='create-user'),
+    path(
+        'users/<int:pk>/profile/',
+        users_views.ProfileDetail.as_view(),
+        name='profile'
+    ),
 ]
