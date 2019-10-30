@@ -1,12 +1,12 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
+from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
-import pytz
 from rest_framework.test import APITestCase
 from vp_app.models import Question, Answer, Reply
 
 
-date = datetime(2019, 10, 19, 4, 25, tzinfo=pytz.utc)
+date = timezone.now() - timedelta(days=2)
 
 
 class QuestionResultsTests(APITestCase):
@@ -39,6 +39,14 @@ class QuestionResultsTests(APITestCase):
             content='answer 4',
             question=question_2
         )
+
+        # Question 3 is in the future
+        question_3 = Question.objects.create(
+            content='question 3',
+            date_published=(date + timedelta(days=2)),
+            date_concluded=(date + timedelta(days=3))
+        )
+
         User.objects.create_user(username='test_user_1')
         User.objects.create_user(username='test_user_2')
         User.objects.create_user(username='test_user_3')
@@ -132,6 +140,7 @@ class QuestionResultsTests(APITestCase):
         """
         Users can retrieve results, even if there were no replies.
         """
+
         # Dummy reply, which we expect to be excluded:
         Reply.objects.create(
             question=Question.objects.get(id=2),
@@ -156,3 +165,26 @@ class QuestionResultsTests(APITestCase):
                 }
             ]
         })
+
+    def test_get_future_results(self):
+        """
+        Normal users cannot access results for a Question that has not
+        yet concluded.
+        """
+        response = self.client.get(
+            reverse('question-results', args=[3])
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_staff_get_future_results(self):
+        """
+        Staff users can access results for a Question that has not yet
+        concluded.
+        """
+        user = User.objects.get(id=1)
+        user.is_staff = True
+        self.client.force_authenticate(user)
+        response = self.client.get(
+            reverse('question-results', args=[3])
+        )
+        self.assertEqual(response.status_code, 200)

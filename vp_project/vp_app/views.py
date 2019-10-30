@@ -98,7 +98,8 @@ class QuestionReplies(generics.ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         """
         If the current date/time is after the Question was published,
-        perform 'get()' as normal. Otherwise, return a 404.
+        perform 'get()' as normal. Otherwise, return a 404. Staff users
+        are always permitted.
         """
         question = Question.objects.get(id=self.kwargs['question_id'])
         if question.date_published <= timezone.now() \
@@ -120,6 +121,19 @@ class ReplyDetail(generics.RetrieveUpdateDestroyAPIView):
 class QuestionResults(generics.RetrieveAPIView):
     serializer_class = ResultsSerializer
     queryset = Question.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        If the current date/time is after the Question was concluded,
+        perform 'retrieve()' as normal. Otherwise, return a 404. Staff
+        users are always permitted.
+        """
+        print(self.kwargs)
+        question = Question.objects.get(id=self.kwargs['pk'])
+        if question.date_concluded <= timezone.now() \
+                or request.user.is_staff:
+            return super().retrieve(request, *args, **kwargs)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class UserRecord(views.APIView):
