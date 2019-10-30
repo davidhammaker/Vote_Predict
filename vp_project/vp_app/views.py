@@ -67,11 +67,13 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ReplyList(generics.ListAPIView):
+    # TODO: Make this a staff-only view, or delete if nothing uses it.
     serializer_class = ReplySerializer
     queryset = Reply.objects.all()
 
 
 class QuestionReplies(generics.ListCreateAPIView):
+    # TODO: Make this view a "CreateAPIView" with permission "IsAuthenticated". No one needs to view individual replies.
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
     authentication_classes = [
         authentication.TokenAuthentication,

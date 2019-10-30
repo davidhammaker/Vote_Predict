@@ -109,12 +109,14 @@ class ReplySerializer(serializers.ModelSerializer):
 
 class ResultsSerializer(serializers.ModelSerializer):
     results = serializers.SerializerMethodField()
+    location_results = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
         fields = [
             'id',
             'results',
+            'location_results',
         ]
 
     def get_results(self, question):
@@ -129,6 +131,28 @@ class ResultsSerializer(serializers.ModelSerializer):
                     prediction=answer.id).count()
             })
         return results
+
+    def get_location_results(self, question):
+        location_votes = []
+        location_results = []
+        replies = [reply for reply in question.replies.all()]
+        for reply in replies:
+            location_vote = {
+                'vote': reply.vote.id,
+                'location': reply.user.profile.location
+            }
+            if location_vote in location_votes:
+                index = location_votes.index(location_vote)
+                location_results[index]['count'] += 1
+            else:
+                location_votes.append(location_vote)
+                location_results.append({
+                    'vote': reply.vote.id,
+                    'location': reply.user.profile.location,
+                    'count': 1
+            })
+        return location_results
+
 
 
 class RecordSerializer(serializers.ModelSerializer):
