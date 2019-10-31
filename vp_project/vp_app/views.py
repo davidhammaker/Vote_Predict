@@ -16,7 +16,7 @@ from .serializers import (
     ResultsSerializer,
     RecordSerializer
 )
-from .permissions import IsStaffOrReadOnly, IsOwnerOrReadOnly
+from .permissions import IsStaffOrReadOnly
 
 
 class QuestionList(generics.ListCreateAPIView):
