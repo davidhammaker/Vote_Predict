@@ -40,18 +40,8 @@ class ReplySerializer(serializers.ModelSerializer):
         # The 'QuestionReplies' view queryset contains all Replies for a
         # single question. This view will have 'question_id' passed in
         # the URL.
-        if 'question_id' in \
-                self.context['request'].parser_context['kwargs']:
-            question_id = self.context['request'] \
-                .parser_context['kwargs']['question_id']
-
-        # The 'ReplyDetail' view will have a 'pk' passed in the URL, not
-        # 'question_id'. We can use that 'pk' to get the associated
-        # 'question_id'.
-        else:
-            reply_id = \
-                self.context['request'].parser_context['kwargs']['pk']
-            question_id = Reply.objects.get(id=reply_id).question.id
+        question_id = self.context['request'] \
+            .parser_context['kwargs']['question_id']
 
         # Use 'question_id' to find associated Question and Answers.
         question = Question.objects.get(id=question_id)

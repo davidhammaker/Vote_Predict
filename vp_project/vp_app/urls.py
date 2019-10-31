@@ -28,19 +28,9 @@ urlpatterns = [
         name='answer-detail'
     ),
     path(
-        'replies/',
-        vp_app_views.ReplyList.as_view(),
-        name='reply-list'
-    ),
-    path(
-        'questions/<int:question_id>/replies/',
-        vp_app_views.QuestionReplies.as_view(),
-        name='question-replies'
-    ),
-    path(
-        'replies/<int:pk>/',
-        vp_app_views.ReplyDetail.as_view(),
-        name='reply-detail'
+        'questions/<int:question_id>/reply/',
+        vp_app_views.QuestionReply.as_view(),
+        name='reply'
     ),
     path(
         'questions/<int:pk>/results/',

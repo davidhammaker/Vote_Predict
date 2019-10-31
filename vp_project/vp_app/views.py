@@ -1,6 +1,7 @@
 from django.utils import timezone
 from rest_framework import (
     generics,
+    mixins,
     authentication,
     permissions,
     views,
@@ -66,36 +67,26 @@ class AnswerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Answer.objects.all()
 
 
-class ReplyList(generics.ListAPIView):
-    # TODO: Make this a staff-only view, or delete if nothing uses it.
-    serializer_class = ReplySerializer
-    queryset = Reply.objects.all()
-
-
-class QuestionReplies(generics.ListCreateAPIView):
-    # TODO: Make this view a "CreateAPIView" with permission "IsAuthenticated". No one needs to view individual replies.
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
+class QuestionReply(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated, ]
     authentication_classes = [
         authentication.TokenAuthentication,
         authentication.SessionAuthentication,
     ]
     serializer_class = ReplySerializer
+    lookup_field = 'question_id'
 
     def get_queryset(self):
         """
         Display all responses to a question with id 'question_id'.
         """
+        user = self.request.user
         question_id = self.kwargs['question_id']
-        return Reply.objects.filter(question=question_id)
-
-    def perform_create(self, serializer):
-        """
-        Relate Users and Questions to Replies.
-        """
-        serializer.save(
-            user=self.request.user,
-            question=Question.objects.get(id=self.kwargs['question_id'])
-        )
+        return Reply.objects.filter(question=question_id, user=user)
 
     def get(self, request, *args, **kwargs):
         """
@@ -106,18 +97,29 @@ class QuestionReplies(generics.ListCreateAPIView):
         question = Question.objects.get(id=self.kwargs['question_id'])
         if question.date_published <= timezone.now() \
                 or request.user.is_staff:
-            return super().get(request, *args, **kwargs)
+            return self.retrieve(request, *args, **kwargs)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
-class ReplyDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsOwnerOrReadOnly, ]
-    authentication_classes = [
-        authentication.TokenAuthentication,
-        authentication.SessionAuthentication,
-    ]
-    serializer_class = ReplySerializer
-    queryset = Reply.objects.all()
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        """
+        Relate Users and Questions to Replies.
+        """
+        serializer.save(
+            user=self.request.user,
+            question=Question.objects.get(id=self.kwargs['question_id'])
+        )
 
 
 class QuestionResults(generics.RetrieveAPIView):
@@ -130,7 +132,6 @@ class QuestionResults(generics.RetrieveAPIView):
         perform 'retrieve()' as normal. Otherwise, return a 404. Staff
         users are always permitted.
         """
-        print(self.kwargs)
         question = Question.objects.get(id=self.kwargs['pk'])
         if question.date_concluded <= timezone.now() \
                 or request.user.is_staff:

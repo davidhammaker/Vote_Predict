@@ -47,4 +47,8 @@ class Reply(models.Model):
     )
 
     def __str__(self):
-        return self.question
+        return self.question.content
+
+    class Meta:
+        verbose_name_plural = "replies"
+
