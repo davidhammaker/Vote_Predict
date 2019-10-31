@@ -131,6 +131,7 @@ class QuestionResultsTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {
             'id': 1,
+            'total_votes': 7,
             'results': [
                 {
                     'answer': 1,
@@ -143,28 +144,34 @@ class QuestionResultsTests(APITestCase):
                     'predictions': 2
                 }
             ],
-            'location_results': [
-                {
-                    'vote': 1,
-                    'location': 'florida',
-                    'count': 2
+            'locations': {
+                'florida': {
+                    'votes': [
+                        {
+                            'answer': 1,
+                            'count': 2
+                        },
+                        {
+                            'answer': 2,
+                            'count': 2
+                        }
+                    ],
+                    'total_count': 4
                 },
-                {
-                    'vote': 2,
-                    'location': 'florida',
-                    'count': 2
-                },
-                {
-                    'vote': 1,
-                    'location': 'colorado',
-                    'count': 2
-                },
-                {
-                    'vote': 2,
-                    'location': 'colorado',
-                    'count': 1
+                'colorado': {
+                    'votes': [
+                        {
+                            'answer': 1,
+                            'count': 2
+                        },
+                        {
+                            'answer': 2,
+                            'count': 1
+                        }
+                    ],
+                    'total_count': 3
                 }
-            ]
+            }
         })
 
     def test_get_empty_results(self):
@@ -183,6 +190,7 @@ class QuestionResultsTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {
             'id': 1,
+            'total_votes': 0,
             'results': [
                 {
                     'answer': 1,
@@ -195,7 +203,7 @@ class QuestionResultsTests(APITestCase):
                     'predictions': 0
                 }
             ],
-            'location_results': []
+            'locations': {}
         })
 
     def test_get_future_results(self):

@@ -98,16 +98,21 @@ class ReplySerializer(serializers.ModelSerializer):
 
 
 class ResultsSerializer(serializers.ModelSerializer):
+    total_votes = serializers.SerializerMethodField()
     results = serializers.SerializerMethodField()
-    location_results = serializers.SerializerMethodField()
+    locations = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
         fields = [
             'id',
+            'total_votes',
             'results',
-            'location_results',
+            'locations',
         ]
+
+    def get_total_votes(self, question):
+        return question.replies.all().count()
 
     def get_results(self, question):
         results = []
@@ -122,26 +127,28 @@ class ResultsSerializer(serializers.ModelSerializer):
             })
         return results
 
-    def get_location_results(self, question):
-        location_votes = []
-        location_results = []
+    def get_locations(self, question):
+        locations = {}
         replies = [reply for reply in question.replies.all()]
+        answers = [answer for answer in question.answers.all()]
         for reply in replies:
-            location_vote = {
-                'vote': reply.vote.id,
-                'location': reply.user.profile.location
-            }
-            if location_vote in location_votes:
-                index = location_votes.index(location_vote)
-                location_results[index]['count'] += 1
-            else:
-                location_votes.append(location_vote)
-                location_results.append({
-                    'vote': reply.vote.id,
-                    'location': reply.user.profile.location,
-                    'count': 1
-            })
-        return location_results
+            location = reply.user.profile.location
+            vote = reply.vote.id
+            if location not in locations:
+                locations[location] = {
+                    'votes': [
+                        {
+                            'answer': answer.id,
+                            'count': 0
+                        } for answer in answers
+                    ],
+                    'total_count': 0
+                }
+            for score in locations[location]['votes']:
+                if score['answer'] == vote:
+                    score['count'] += 1
+            locations[location]['total_count'] += 1
+        return locations
 
 
 
