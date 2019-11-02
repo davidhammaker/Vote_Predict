@@ -10,9 +10,9 @@ date = timezone.now() - timedelta(days=1)
 
 
 class ReplyDetailTests(APITestCase):
-    url = reverse('reply', args=[1])
-    url_concluded_question = reverse('reply', args=[3])
-    url_unpublished_question = reverse('reply', args=[4])
+    url = reverse('question-reply', args=[1])
+    url_concluded_question = reverse('question-reply', args=[3])
+    url_unpublished_question = reverse('question-reply', args=[4])
 
     def setUp(self) -> None:
         question_1 = Question.objects.create(

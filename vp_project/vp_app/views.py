@@ -7,7 +7,9 @@ from rest_framework import (
     views,
     status
 )
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from .models import Question, Answer, Reply
 from .serializers import (
     QuestionSerializer,
@@ -17,6 +19,21 @@ from .serializers import (
     RecordSerializer
 )
 from .permissions import IsStaffOrReadOnly
+
+
+@api_view(['GET'])
+def root_index(request, format=None):
+    return Response({
+        'questions': reverse(
+            'question-list', request=request, format=format
+        ),
+        'record': reverse(
+            'record', request=request, format=format
+        ),
+        'replies': reverse(
+            'reply-list', request=request, format=format
+        )
+    })
 
 
 class QuestionList(generics.ListCreateAPIView):
@@ -120,6 +137,18 @@ class QuestionReply(mixins.CreateModelMixin,
             user=self.request.user,
             question=Question.objects.get(id=self.kwargs['question_id'])
         )
+
+
+class ReplyList(generics.ListAPIView):
+    serializer_class = ReplySerializer
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication
+    ]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Reply.objects.filter(user=self.request.user).all()
 
 
 class QuestionResults(generics.RetrieveAPIView):

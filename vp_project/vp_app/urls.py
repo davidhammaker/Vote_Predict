@@ -3,6 +3,11 @@ from . import views as vp_app_views
 
 urlpatterns = [
     path(
+        '',
+        vp_app_views.root_index,
+        name='root-index'
+    ),
+    path(
         'questions/',
         vp_app_views.QuestionList.as_view(),
         name='question-list'
@@ -30,7 +35,12 @@ urlpatterns = [
     path(
         'questions/<int:question_id>/reply/',
         vp_app_views.QuestionReply.as_view(),
-        name='reply'
+        name='question-reply'
+    ),
+    path(
+        'replies/',
+        vp_app_views.ReplyList.as_view(),
+        name='reply-list'
     ),
     path(
         'questions/<int:pk>/results/',
