@@ -29,3 +29,8 @@ class RepliesAdmin(admin.ModelAdmin):
 
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Reply, RepliesAdmin)
+
+# Other customizations
+admin.site.site_header = 'Vote Predict Administration'
+admin.site.site_title = 'Vote Predict Admin'
+admin.site.index_title = 'Index'

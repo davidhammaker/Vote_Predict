@@ -1,0 +1,51 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+    <style media="screen">
+        #header, .module caption, .module h2 {
+            background-color: #000;
+        }
+        #header, #header a:link, #header a:visited, #header a:hover, .module caption, .module caption a:link, .module caption a:visited, .module h2 {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 0px;
+        }
+        #header a:hover, .module caption a:hover {
+            text-shadow: 0px 0px 1px #fff;
+        }
+        div.breadcrumbs {
+            background-color: #f5f5f5;
+            color: #000;
+        }
+        div.breadcrumbs a {
+            color: #337ab7;
+            text-decoration: none;
+            border-bottom: 0px;
+        }
+        div.breadcrumbs a:hover {
+            color: #23527c;
+            text-decoration: underline;
+            border-bottom: 0px;
+        }
+        .module caption, .module h2 {
+            border-radius: 4px 4px 0 0;
+        }
+        tr {
+            background-color: #f5f5f5;
+        }
+        #changelist #toolbar form input[type="submit"], #changelist .actions .button {
+            background-color: #000;
+            color: #fff;
+            border: 0;
+            box-shadow: none;
+        }
+        #changelist #toolbar form input[type="submit"]:hover, #changelist .actions .button:hover {
+            background-color: #23527c;
+            color: #fff;
+        }
+        #changelist #toolbar form input[type="submit"]:active, #changelist .actions .button:active {
+            background-color: #337ab7;
+            color: #fff;
+        }
+    </style>
+{% endblock %}
