@@ -40,9 +40,10 @@ $ python manage.py makemigrations
 $ python manage.py migrate
 ```
 
-If you would like to access the project's [Django Admin Site](https://docs.djangoproject.com/en/2.2/ref/contrib/admin/), you'll need to create a superuser:
+If you would like to access the project's [Django Admin Site](https://docs.djangoproject.com/en/2.2/ref/contrib/admin/), you'll need to create a superuser. Try either of the following:
 ```shell
 $ django-admin createsuperuser
+$ python manage.py createsuperuser
 ```
 
 ### Running Locally
