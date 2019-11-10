@@ -1,5 +1,4 @@
-from django.contrib.auth.models import User
-from rest_framework import generics
+from rest_framework import generics, permissions, authentication
 from .serializers import UserSerializer, ProfileSerializer
 from .models import Profile
 
@@ -14,15 +13,19 @@ class UserCreate(generics.CreateAPIView):
         new_user = serializer.save()
         new_user.set_password(new_user.password)
         new_user.save()
+        Profile.objects.create(user=new_user)
 
 
-# TODO: Authentication and Permissions, Test
 class ProfileDetail(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
+    authentication_classes = [
+        authentication.TokenAuthentication,
+        authentication.SessionAuthentication,
+    ]
+    permission_classes = [permissions.IsAuthenticated, ]
 
     def get_object(self):
         """
         Get Profile based on User.
         """
-        user = User.objects.get(id=self.kwargs['pk'])
-        return Profile.objects.get(user=user)
+        return Profile.objects.get(user=self.request.user)

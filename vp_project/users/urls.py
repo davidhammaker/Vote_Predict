@@ -6,7 +6,7 @@ urlpatterns = [
     path('api-token-auth/', authtoken_views.obtain_auth_token),
     path('users/', users_views.UserCreate.as_view(), name='create-user'),
     path(
-        'users/<int:pk>/profile/',
+        'profile/',
         users_views.ProfileDetail.as_view(),
         name='profile'
     ),
