@@ -9,7 +9,7 @@ from vp_app.models import Question, Answer, Reply
 date = timezone.now() - timedelta(days=1)
 
 
-class ReplyDetailTests(APITestCase):
+class ReplyListTests(APITestCase):
     url = reverse('reply-list')
 
     def setUp(self) -> None:
